@@ -30,6 +30,23 @@ if (Meteor.isServer) {
                     body: { message: 'Usuario não localizado!' }
                 }
             }
+        },
+
+        get: function(){
+            var user = Meteor.users.findOne({ //busca no bd da conta
+                'emails.address': this.urlParams.email //pegando o email do parametro
+            });
+            console.log(user);
+
+            // return{
+            //     statusCode:200,
+            //     body:
+            //     {
+            //         profile: { name: user.name },    
+            //         email: user.email,
+            //         password: user.password        
+            //     }
+            // }
         }
     })
 
@@ -58,10 +75,17 @@ if (Meteor.isServer) {
             
             Meteor.call('saveAccount', user, function (err, res) {
                 if (err) {
-                    future.return({
-                        statusCode: 404,
-                        body: { message: err.reason }
-                    })
+                    if (err.reason = 'Email already exists.'){
+                        future.return({
+                            statusCode: 404,
+                            body: { message: 'Você está cadastrado.' }
+                        })    
+                    }else{
+                        future.return({
+                            statusCode: 404,
+                            body: { message: err.reason }
+                        })
+                    }
                 } else {
                     console.log('tudo certo aqui.')
                     future.return({
